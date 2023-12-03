@@ -1,0 +1,171 @@
+basePath: /
+definitions:
+  accident-service_internal_biz.Accident:
+    properties:
+      endDate:
+        type: string
+      id:
+        type: integer
+      lat:
+        description: Shape     string
+        type: number
+      lon:
+        type: number
+      name:
+        type: string
+      startDate:
+        type: string
+    type: object
+  internal_route.AccidentDTO:
+    properties:
+      endDate:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      name:
+        type: string
+      startDate:
+        type: string
+    type: object
+  internal_route.ListDTO:
+    properties:
+      accidents:
+        items:
+          $ref: '#/definitions/accident-service_internal_biz.Accident'
+        type: array
+      count:
+        type: integer
+    type: object
+host: accident.e-bus.site
+info:
+  contact:
+    email: suro@hyneo.ru
+    name: Suro
+    url: https://t.me/suronek
+  description: This is documentation api for backend
+  title: Accident Service Swagger API
+  version: "1.0"
+paths:
+  /accident/:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_route.ListDTO'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List accident
+      tags:
+      - accident
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: dto
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/internal_route.AccidentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Create accident
+      tags:
+      - accident
+  /accident/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Accident ID
+        format: uint64
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete accident
+      tags:
+      - accident
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Accident ID
+        format: uint64
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: dto
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/internal_route.AccidentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update accident
+      tags:
+      - accident
+securityDefinitions:
+  authorization:
+    in: header
+    name: authorization
+    type: apiKey
+swagger: "2.0"
