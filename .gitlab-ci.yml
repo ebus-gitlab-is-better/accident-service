@@ -33,4 +33,4 @@ deploy-prod:
   dependencies:
     - build
   only:
-    - mains
+    - main
