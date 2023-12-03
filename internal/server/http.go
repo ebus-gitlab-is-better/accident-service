@@ -1,6 +1,7 @@
 package server
 
 import (
+	_ "accident-service/docs"
 	"accident-service/internal/conf"
 	"accident-service/internal/data"
 	"accident-service/internal/route"
