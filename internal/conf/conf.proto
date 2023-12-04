@@ -48,4 +48,5 @@ message Data {
   Database database = 1;
   Redis redis = 2;
   KeyCloak keycloak = 3;
+  string rabbit = 4;
 }

@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/go-kratos/kratos/v2 v2.7.0
 	github.com/google/wire v0.5.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.2

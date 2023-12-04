@@ -28,7 +28,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	db := data.NewDB(confData)
 	goCloak := data.NewKeycloak(confData)
 	keycloakAPI := data.NewKeyCloakAPI(confData, goCloak, logger)
-	dataData, cleanup, err := data.NewData(confData, logger, db, keycloakAPI)
+	channel := data.NewRabbit(confData)
+	dataData, cleanup, err := data.NewData(confData, logger, db, keycloakAPI, channel)
 	if err != nil {
 		return nil, nil, err
 	}

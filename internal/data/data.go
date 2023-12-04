@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	amqp "github.com/rabbitmq/amqp091-go"
+
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
@@ -18,20 +20,34 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewAccidentRepo, NewDB, NewKeyCloakAPI, NewKeycloak)
+var ProviderSet = wire.NewSet(
+	NewData,
+	NewAccidentRepo,
+	NewDB,
+	NewKeyCloakAPI,
+	NewKeycloak,
+	NewRabbit,
+)
 
 // Data структура для работы с базой данных
 type Data struct {
 	db       *gorm.DB //Реализация работы с базой данной через библиотеку gorm
 	keycloak *KeycloakAPI
+	rabbit   *amqp.Channel
 }
 
 // NewData создания экземпляра для работы с базой данных
-func NewData(c *conf.Data, logger log.Logger, db *gorm.DB, keycloak *KeycloakAPI) (*Data, func(), error) {
+func NewData(
+	c *conf.Data,
+	logger log.Logger,
+	db *gorm.DB,
+	keycloak *KeycloakAPI,
+	rabbit *amqp.Channel,
+) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 	}
-	return &Data{db: db, keycloak: keycloak}, cleanup, nil
+	return &Data{db: db, keycloak: keycloak, rabbit: rabbit}, cleanup, nil
 }
 
 type contextTxKey struct{}
@@ -88,4 +104,25 @@ func NewDB(c *conf.Data) *gorm.DB {
 	}
 	db.AutoMigrate(&Accident{})
 	return db
+}
+
+func NewRabbit(c *conf.Data) *amqp.Channel {
+	conn, err := amqp.Dial(c.Rabbit)
+	if err != nil {
+		panic(err)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		panic(err)
+	}
+	ch.QueueDeclare(
+		"accident", // name
+		false,      // durable
+		false,      // delete when unused
+		false,      // exclusive
+		false,      // no-wait
+		nil,        // arguments
+	)
+	return ch
 }

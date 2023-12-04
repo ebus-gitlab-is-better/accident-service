@@ -3,19 +3,20 @@ package data
 import (
 	"accident-service/internal/biz"
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/rabbitmq/amqp091-go"
 )
 
 type Accident struct {
-	Id   uint64 `gorm:"primaryKey"`
-	Name string
-	// Shape     string
-	Lat       float64
-	Lon       float64
-	StartDate time.Time
-	EndDate   *time.Time
+	Id        uint64     `json:"id" gorm:"primaryKey"`
+	Name      string     `json:"name"`
+	Lat       float64    `json:"lat"`
+	Lon       float64    `json:"lon"`
+	StartDate time.Time  `json:"start_date"`
+	EndDate   *time.Time `json:"end_date,omitempty"`
 }
 
 func (m Accident) modelToResponse() *biz.Accident {
@@ -49,6 +50,21 @@ func (r *accidentRepo) Create(ctx context.Context, accident *biz.Accident) error
 	if err := r.data.db.Create(&accidentDB).Error; err != nil {
 		return err
 	}
+	jsonData, err := json.Marshal(accident)
+	if err != nil {
+		return err
+	}
+
+	r.data.rabbit.PublishWithContext(context.TODO(),
+		"",
+		"accident",
+		false,
+		false,
+		amqp091.Publishing{
+			ContentType:  "application/json",
+			Body:         jsonData,
+			DeliveryMode: amqp091.Persistent,
+		})
 	return nil
 }
 
