@@ -11,6 +11,21 @@ option java_package = "api.accident.v1";
 
 service Accident {
 	rpc CreateAccident (CreateAccidentRequest) returns (google.protobuf.Empty);
+	rpc ListAccident (google.protobuf.Empty) returns(ListAccidentReply);
+}
+
+message ListAccidentReply {
+	int64 total = 1;
+	repeated AccidentReply accidents = 2;
+}
+
+message AccidentReply {
+	uint64 id = 1;
+	string name = 2;
+	float lat = 3;
+	float lon = 4;
+	google.protobuf.Timestamp start_date = 5;
+	optional google.protobuf.Timestamp end_date = 6;
 }
 
 message CreateAccidentRequest {

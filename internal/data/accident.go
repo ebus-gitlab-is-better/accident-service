@@ -60,7 +60,8 @@ func (r *accidentRepo) Delete(ctx context.Context, id uint64) error {
 // List implements biz.AccidentRepo.
 func (r *accidentRepo) List(ctx context.Context) ([]*biz.Accident, int64, error) {
 	var listDB []Accident
-	localDB := r.data.db.Model(&Accident{})
+	currentDate := time.Now()
+	localDB := r.data.db.Model(&Accident{}).Where("end_date > ?", currentDate)
 	if err := localDB.Find(&listDB).Error; err != nil {
 		return nil, 0, err
 	}

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Accident_CreateAccident_FullMethodName = "/api.accident.v1.Accident/CreateAccident"
+	Accident_ListAccident_FullMethodName   = "/api.accident.v1.Accident/ListAccident"
 )
 
 // AccidentClient is the client API for Accident service.
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AccidentClient interface {
 	CreateAccident(ctx context.Context, in *CreateAccidentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListAccident(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAccidentReply, error)
 }
 
 type accidentClient struct {
@@ -47,11 +49,21 @@ func (c *accidentClient) CreateAccident(ctx context.Context, in *CreateAccidentR
 	return out, nil
 }
 
+func (c *accidentClient) ListAccident(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListAccidentReply, error) {
+	out := new(ListAccidentReply)
+	err := c.cc.Invoke(ctx, Accident_ListAccident_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccidentServer is the server API for Accident service.
 // All implementations must embed UnimplementedAccidentServer
 // for forward compatibility
 type AccidentServer interface {
 	CreateAccident(context.Context, *CreateAccidentRequest) (*emptypb.Empty, error)
+	ListAccident(context.Context, *emptypb.Empty) (*ListAccidentReply, error)
 	mustEmbedUnimplementedAccidentServer()
 }
 
@@ -61,6 +73,9 @@ type UnimplementedAccidentServer struct {
 
 func (UnimplementedAccidentServer) CreateAccident(context.Context, *CreateAccidentRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccident not implemented")
+}
+func (UnimplementedAccidentServer) ListAccident(context.Context, *emptypb.Empty) (*ListAccidentReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAccident not implemented")
 }
 func (UnimplementedAccidentServer) mustEmbedUnimplementedAccidentServer() {}
 
@@ -93,6 +108,24 @@ func _Accident_CreateAccident_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Accident_ListAccident_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccidentServer).ListAccident(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Accident_ListAccident_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccidentServer).ListAccident(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Accident_ServiceDesc is the grpc.ServiceDesc for Accident service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -103,6 +136,10 @@ var Accident_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateAccident",
 			Handler:    _Accident_CreateAccident_Handler,
+		},
+		{
+			MethodName: "ListAccident",
+			Handler:    _Accident_ListAccident_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
